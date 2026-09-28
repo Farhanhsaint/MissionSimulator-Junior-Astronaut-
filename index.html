@@ -1,30 +1,96 @@
 <!DOCTYPE html>
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Junior Astronaut Mission Trainer</title>
+<title>Junior Astronaut Mission Trainer: Supernova</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;600&family=Space+Mono&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#f6ecdf;--card:#fffaf2;--ink:#2b1a14;--mute:#7a5f52;--line:#e2cdb8;--acc:#c4471f;--ok:#1f8a6e;--bad:#b3261e;--pw:#d9950f;--o2:#2a7fb8;--fd:#5a9a2b;--sh:#7b5ea7}
-@media (prefers-color-scheme:dark){:root{--bg:#1c1210;--card:#2a1c18;--ink:#f6e6d2;--mute:#c2a591;--line:#4a3129;--acc:#ff7a4d;--ok:#4fd1a5;--bad:#ff8a80;--pw:#f2b73d;--o2:#6cb8ee;--fd:#8fcf58;--sh:#b79be0}}
+:root{--ash:#9aa6bb;--mist:#c5cedd;--iris:#ff9a3d;--saffron:#ffc857;--line:#2a3350;--mute:#9aa6bb;--pw:#ffc857;--o2:#7aa2f7;--fd:#3fd0b0;--sh:#b7c3d9;--ok:#ff7a59}
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 system-ui,sans-serif;padding:env(safe-area-inset-top,0) 0 env(safe-area-inset-bottom,0)}
-main{max-width:720px;margin:0 auto;padding:16px}
-h1,h2{margin:0;line-height:1.15}h1{font-size:1.8rem}
-.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin:12px 0}
-.bar{height:14px;background:var(--line);border-radius:7px;overflow:hidden;flex:1}.bar i{display:block;height:100%;transition:width .4s}
-.row{display:flex;align-items:center;gap:10px;margin:8px 0}.row b{width:100px;flex:none}.row span{width:40px;text-align:right}
-button{font:inherit;font-weight:700;border:0;border-radius:10px;padding:10px 16px;background:var(--acc);color:#fff;cursor:pointer}
-button:focus-visible{outline:3px solid var(--ink);outline-offset:2px}button:disabled{opacity:.4;cursor:default}
-button.alt{background:var(--line);color:var(--ink)}button.on{background:var(--ink);color:var(--bg)}
-.step{width:38px;height:38px;padding:0}
-.task{display:flex;align-items:center;gap:10px;padding:8px 0;border-top:1px solid var(--line)}.task:first-of-type{border:0}
-.task div{flex:1}.task small{color:var(--mute);display:block}.n{width:24px;text-align:center;font-weight:700}
-.alert{border-left:6px solid var(--pw);padding:8px 12px;background:var(--card);border-radius:8px;margin:10px 0}
-.alert.bad{border-color:var(--bad)}.alert.good{border-color:var(--ok)}
-.log{color:var(--mute);font-size:.92rem}.top{display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:wrap}
-.seg{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0}
+html{background:#05070c}
+body{margin:0;color:#f4f7fc;font:300 18px/1.55 'Space Grotesk',system-ui,sans-serif;background:radial-gradient(ellipse at 50% 30%,#111a30 0%,#080c17 55%,#04060b 100%) fixed;padding:env(safe-area-inset-top,0) 0 env(safe-area-inset-bottom,0)}
+main{max-width:1280px;margin:0 auto;padding:24px}
+.nav{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:60px}
+.logo{display:flex;align-items:center;gap:10px;font:600 14px 'Space Grotesk',sans-serif;letter-spacing:.025em;text-transform:uppercase}
+.lab{font:400 11px/1.3 'Space Mono',monospace;letter-spacing:.18em;text-transform:uppercase;color:var(--ash);margin:0 0 14px}
+.amber{color:var(--saffron)}.red{color:#ff6b6b}.green{color:#2fd0a8}.ash{color:var(--ash)}
+h1,h2{font-weight:300;margin:0}
+.display{font-size:clamp(48px,9vw,113px);line-height:1.02;letter-spacing:-.04em;margin-bottom:30px}
+.h{font-size:clamp(42px,7vw,78px);line-height:1.05;letter-spacing:-.04em;margin-bottom:30px}
+h2{font-size:24px;letter-spacing:-.02em;margin-bottom:12px}
+p{margin:0 0 18px;color:var(--mist)}
+.hero{display:grid;grid-template-columns:.9fr 1.25fr;gap:48px;align-items:center;margin-bottom:60px}
+@media(max-width:800px){.hero{grid-template-columns:1fr;gap:36px}.nova{order:-1}}
+.nova{width:100%;aspect-ratio:1;display:block;touch-action:pan-y}
+button{font:600 14px 'Space Grotesk',sans-serif;letter-spacing:.025em;text-transform:uppercase;border:0;border-radius:24px;padding:14px 22px;background:var(--iris);color:#0f1424;cursor:pointer}
+button:focus-visible{outline:2px solid var(--saffron);outline-offset:3px}button:disabled{opacity:.35;cursor:default}
+button.alt,button.on{background:none;border-radius:0;padding:6px 0;margin:0 18px 6px 0;color:var(--ash)}
+button.alt:hover{color:#fff}
+button.on{color:#fff;text-decoration:underline;text-decoration-color:var(--saffron);text-decoration-thickness:2px;text-underline-offset:6px}
+button.step{font-size:27px;font-weight:400;width:40px;height:40px;padding:0;margin:0}
+.seg{margin:0 0 24px}
+input{font:400 16px 'Space Grotesk',sans-serif;width:5em;background:none;color:#fff;border:0;border-bottom:1px solid var(--ash);padding:4px 0;border-radius:0}
+.row{display:flex;align-items:center;gap:18px;margin:12px 0}
+.row b{width:110px;flex:none;font:600 12px 'Space Grotesk',sans-serif;text-transform:uppercase;letter-spacing:.025em;color:var(--ash)}
+.bar{height:4px;background:#1a2136;flex:1;border-radius:2px;overflow:hidden}.bar i{display:block;height:100%;transition:width .4s}
+.row span{width:40px;text-align:right;font-weight:400;font-variant-numeric:tabular-nums}
+.task{display:flex;align-items:center;gap:12px;padding:12px 0}.task div{flex:1}
+.task b{font-weight:400;font-size:24px;letter-spacing:-.02em}.task small{display:block;color:var(--ash);font-size:14px}
+.n{width:28px;text-align:center;font-size:24px;font-weight:400}
+.top{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap}
+.sec{margin:60px 0}.play{max-width:760px}
+.log{color:var(--ash);font-size:15px}
 .chart{overflow-x:auto}.chart svg{width:100%;min-width:420px;height:auto}
-input{font:inherit;width:5em;padding:6px;border-radius:8px;border:1px solid var(--line);background:var(--card);color:var(--ink)}
-.leg{display:flex;gap:14px;flex-wrap:wrap;font-size:.9rem}.leg i{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:5px}
+.leg{display:flex;gap:18px;flex-wrap:wrap;font-size:14px;color:var(--mist)}.leg i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px}
+ul{padding-left:20px;color:var(--mist)}li{margin-bottom:12px}
+.big{width:100%;height:76vh;display:block;cursor:pointer;outline:none;touch-action:pan-y}
+.big:focus-visible{outline:2px solid var(--saffron);outline-offset:-2px;border-radius:24px}
+.introtext{transition:opacity .6s}.introtext.gone{opacity:0}
+.hint{text-align:center;font:600 12px 'Space Grotesk',sans-serif;letter-spacing:.025em;text-transform:uppercase;color:var(--ash);animation:pulse 2s infinite}
+@keyframes pulse{50%{opacity:.35}}@keyframes fin{from{opacity:0}}
+.hero{animation:fin .9s}
+@media(prefers-reduced-motion:reduce){.hint,.hero{animation:none}}
+main{position:relative;z-index:1}
+body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;background:radial-gradient(ellipse at center,transparent 55%,rgba(2,3,7,.6) 100%)}
+body::after{content:"";position:fixed;inset:-40px;pointer-events:none;z-index:9;opacity:.07;mix-blend-mode:overlay;animation:grain .8s steps(1) infinite;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>")}
+@keyframes grain{0%{transform:translate(0,0)}25%{transform:translate(-20px,14px)}50%{transform:translate(16px,-18px)}75%{transform:translate(-10px,-12px)}}
+@media(prefers-reduced-motion:reduce){body::after{animation:none}}
+html{scroll-behavior:smooth}body{overflow-x:hidden}
+.stage{position:relative;width:100vw;margin:-24px 0 0 calc(50% - 50vw);height:100vh;height:100svh;min-height:520px;overflow:hidden}
+.stage canvas{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:pan-y}
+.stage .nav{position:absolute;top:0;left:0;right:0;margin:0;padding:24px clamp(24px,5vw,72px);z-index:2;pointer-events:none}
+.cap{position:absolute;left:0;right:0;bottom:0;z-index:2;padding:140px clamp(24px,5vw,72px) 44px;background:linear-gradient(to top,#05070c 10%,rgba(5,7,12,.78) 50%,rgba(5,7,12,0));pointer-events:none;animation:fin 1.6s .6s backwards}
+.cap a{pointer-events:auto}
+.cap .hint{text-align:left;margin:18px 0 0}
+.mega{font-size:clamp(44px,8.5vw,128px);line-height:.98;letter-spacing:-.045em;font-weight:300;margin:0 0 20px}
+.mega b,.statement b{font-weight:600}
+.scroll{display:inline-block;font:400 12px 'Space Mono',monospace;letter-spacing:.18em;text-transform:uppercase;color:var(--saffron);text-decoration:none;animation:pulse 2s infinite}
+.menu{max-width:1100px;margin:0 auto;padding:96px 0 60px}
+.statement{font-size:clamp(32px,5vw,64px);line-height:1.08;letter-spacing:-.035em;font-weight:300;margin:0 0 24px}
+p.lead{max-width:640px;font-size:20px;margin-bottom:60px}
+.opt{display:grid;grid-template-columns:60px 220px 1fr;gap:18px;align-items:baseline;padding:30px 0;border-top:1px solid rgba(255,255,255,.12)}
+@media(max-width:800px){.opt{grid-template-columns:1fr;gap:8px}}
+.idx{font:400 12px 'Space Mono',monospace;color:var(--saffron);letter-spacing:.18em}
+.ttl b{font-weight:600;font-size:20px;display:block}.ttl small{color:var(--ash);font-size:14px}
+.opt .seg{margin:0}
+.opt .seg button{font:300 clamp(22px,3vw,34px)/1.1 'Space Grotesk',sans-serif;text-transform:none;letter-spacing:-.02em;margin:0 28px 6px 0;padding:6px 0;color:#6f7b92}
+.opt .seg button.on{font-weight:600;color:#fff}.opt .seg button:hover{color:#fff}
+.go{display:flex;align-items:center;gap:30px;flex-wrap:wrap;padding-top:36px;border-top:1px solid rgba(255,255,255,.12)}
+button.cta{font-size:16px;padding:20px 40px;border-radius:40px}
+@media(prefers-reduced-motion:reduce){.stage .cap,.scroll{animation:none}}
+.crew{display:flex;gap:10px;align-items:center;margin:8px 0 18px}
+.hm{width:36px;height:36px;color:#f4f7fc;opacity:.22;transition:opacity .3s,transform .3s}
+.hm.free{opacity:1}.hm.free .v{fill:var(--saffron)}
+.task{display:grid;grid-template-columns:44px 1fr auto;gap:14px;align-items:center;padding:14px 0;border-top:1px solid rgba(255,255,255,.08)}
+.task:first-of-type{border-top:0}
+.task b{font-weight:300;transition:font-weight .2s}.task.act b{font-weight:600}
+.ic{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;color:var(--c);border:1px solid color-mix(in srgb,var(--c) 45%,transparent);background:color-mix(in srgb,var(--c) 10%,transparent)}
+.ic svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.pv{display:block;font:400 12px 'Space Mono',monospace;letter-spacing:.06em;color:var(--c);opacity:.4;font-style:normal;margin-top:2px;transition:opacity .2s}
+.task.act .pv{opacity:1}
+.pips{display:flex;gap:4px}
+.pip{width:24px;height:24px;padding:0;margin:0;border-radius:7px;background:#1a2136;box-shadow:inset 0 0 0 1px rgba(255,255,255,.1);transition:background .2s,transform .15s,box-shadow .2s}
+.pip.on{background:var(--c);box-shadow:0 0 12px color-mix(in srgb,var(--c) 55%,transparent)}
+.pip:hover{transform:translateY(-2px)}
 </style></head><body><main id="app"></main>
 <script>
 // ---------- CONFIG: every number that shapes the game lives here ----------
@@ -51,7 +117,7 @@ const COLORS = {pw:'--pw',o2:'--o2',fd:'--fd',sh:'--sh',hp:'--ok'};
 const NAMES = {pw:'Power',o2:'Oxygen',fd:'Food',sh:'Shield',hp:'Health'};
 
 // ---------- STATE ----------
-let cfg = {planet:'mars', diff:'normal', days:30}, scr = 'menu', S, A, P, D;
+let cfg = {planet:'mars', diff:'normal', days:30}, scr = 'intro', S, A, P, D;
 const $ = id => document.getElementById(id);
 const used = () => Object.values(A).reduce((a,b)=>a+b,0);
 const bestKey = () => `best-${cfg.planet}-${cfg.diff}-${cfg.days}`;
@@ -61,7 +127,7 @@ function setBest(v){ try{ localStorage.setItem(bestKey(), v) }catch(e){} }
 function start(){
   P = PLANETS[cfg.planet]; D = DIFFS[cfg.diff];
   S = {day:1, ...BASE.start, done:0, log:[], hist:[], short:{pw:[],o2:[],fd:[]}, flares:[], storms:0, nights:0, newBest:false};
-  S.hist.push({...BASE.start}); S.next = roll(); resetA(); scr = 'play'; draw();
+  S.hist.push({...BASE.start}); S.next = roll(); resetA(); scr = 'play'; scrollTo({top:0,behavior:'instant'}); draw();
 }
 function resetA(){ A = {pw:0,o2:0,fd:0,sh:0,rs:0} }
 function roll(){
@@ -132,49 +198,275 @@ function chart(){
 }
 
 // ---------- SCREENS ----------
+let raf = 0, parts = [];
 const bar = (l,v,c) => `<div class="row"><b>${l}</b><div class="bar"><i style="width:${Math.max(0,v)}%;background:var(${c})"></i></div><span>${Math.round(v)}</span></div>`;
-function setCfg(k,v){ cfg[k] = k==='days' ? +v : v; draw() }
-function setDays(v){ cfg.days = Math.max(5, Math.min(100, Math.round(+v)||30)); draw() }
+function setCfg(k,v){ cfg[k] = k==='days' ? +v : v; $('menu').innerHTML = menuHTML() }
+function setDays(v){ cfg.days = Math.max(5, Math.min(100, Math.round(+v)||30)); $('menu').innerHTML = menuHTML() }
 function seg(key, opts){ return `<div class="seg">${opts.map(([v,l])=>`<button class="${cfg[key]===v?'on':'alt'}" aria-pressed="${cfg[key]===v}" onclick="setCfg('${key}','${v}')">${l}</button>`).join('')}</div>` }
+const NAV = `<nav class="nav"><span class="logo"><svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 2 18 17H2Z" fill="#ff9a3d"/></svg>Mission Trainer</span><span class="lab" style="margin:0">NASA Space Apps 2026</span></nav>`;
 
+// 3D engine: own perspective projection, drag to rotate, hover for star names
+const PAL = {blue:['#dbe7ff','#a9c4ff','#7aa2f7','#4d78c9','#8b9bb4'], warm:['#ffe29a','#ffc857','#ffa93a','#ff8a3d','#e8622c'], white:['#ffffff','#eef1f5','#cfd6df','#a7b0bd','#7d8794']};
+const ALL = [...PAL.blue, ...PAL.warm, ...PAL.white];
+let cache = {}, groups = [], field = [];
+function sprite(c){
+  if(cache[c]) return cache[c];
+  const k = document.createElement('canvas'); k.width = k.height = 48; const x = k.getContext('2d');
+  const g = x.createRadialGradient(24,24,0,24,24,24); g.addColorStop(0,c); g.addColorStop(.12,c); g.addColorStop(.26,c+'55'); g.addColorStop(.55,c+'12'); g.addColorStop(1,c+'00');
+  x.fillStyle = g; x.fillRect(0,0,48,48); return cache[c] = k;
+}
+const pick = a => a[Math.floor(Math.random()*a.length)];
+function rng(a){ return () => { a |= 0; a = a+0x6D2B79F5|0; let t = Math.imul(a^a>>>15,1|a); t = t+Math.imul(t^t>>>7,61|t)^t; return ((t^t>>>14)>>>0)/4294967296 } }
+const rv = () => { const u = Math.random()*2-1, a = Math.random()*6.283, q = Math.sqrt(1-u*u); return [q*Math.cos(a), u, q*Math.sin(a)] };
+const JETS = Array.from({length:14}, rv);
+function initParts(){
+  parts = [];
+  for(let i=0;i<1400;i++){
+    const t = Math.random(); let d = rv(), r;
+    if(t<.45) r = .62 + (Math.random()+Math.random()-1)*.07;
+    else if(t<.7) r = Math.pow(Math.random(),1.6)*.35;
+    else if(t<.9){ const j = pick(JETS).map(v=>v+(Math.random()-.5)*.14), m = Math.hypot(...j); d = j.map(v=>v/m); r = .1 + Math.random()*.85 }
+    else r = .9 + Math.random()*.3;
+    const c = r<.3 ? pick(PAL.white) : r<.7 ? (Math.random()<.8 ? pick(PAL.blue) : pick(PAL.white)) : (Math.random()<.85 ? pick(PAL.warm) : pick(PAL.blue));
+    parts.push({d, r, s:1+Math.random()*2.5, c, ph:Math.random()*6.28, rot:Math.random()*6.28, v:1.2+Math.random()*3});
+  }
+}
+function buildCluster(){
+  const rnd = rng(7), greek = 'αβγδεζηθι';
+  const G = [['NOVA IGNIS','Novae',-.12,-.02,0,9],['ARA MARTIS','Martis',.52,-.5,-.35,7],['CUSTOS LUNAE','Lunae',-.58,-.52,.3,7],['VELA ORBIS','Orbis',.55,.45,.25,8],['NAVIS SOLIS','Solis',-.5,.5,-.3,7]];
+  groups = G.map(([t,g,cx,cy,cz,n]) => {
+    const st = [], ln = [];
+    for(let i=0;i<n;i++){ const a = rnd()*6.283, d = i ? Math.sqrt(rnd())*.3 : 0;
+      st.push({x:cx+Math.cos(a)*d, y:cy+Math.sin(a)*d*.9, z:cz+(i?(rnd()-.5)*.5:0), m:i?.35+rnd()*.5:1, c:ALL[Math.floor(rnd()*15)], ph:rnd()*6.28, name:greek[i]+' '+g}) }
+    for(let i=1;i<n;i++){ let b = 0, bd = 9; for(let j=0;j<i;j++){ const d = Math.hypot(st[i].x-st[j].x, st[i].y-st[j].y, st[i].z-st[j].z); if(d<bd){ bd = d; b = j } } ln.push([i,b]) }
+    return {t, cx, cy, cz, st, ln};
+  });
+  field = Array.from({length:240}, () => ({fx:rnd(), fy:rnd(), z:.3+rnd()*.7, s:.4+rnd()*1.2, c:ALL[Math.floor(rnd()*15)], ph:rnd()*6.28}));
+}
+function nova(cv, o){
+  const ctx = cv.getContext('2d'), dpr = window.devicePixelRatio||1, w = cv.clientWidth, h = cv.clientHeight;
+  cv.width = w*dpr; cv.height = h*dpr;
+  const still = matchMedia('(prefers-reduced-motion: reduce)').matches, I = o.interactive, R = Math.min(w,h)*(I?.36:.40), D = 4.2, AX = I ? 1 : Math.max(1, Math.min(1.7, w/h*.85)), CY = h*.45;
+  const cam = {yaw:0, pitch:-.15, vy:.0025}, sh = {x:0, y:0};
+  let target = 0, charge = 0, t0 = 0, boom = false, done = false, born = null, drag = null, moved = 0, mouse = null;
+  const proj = (x,y,z) => {
+    const cy = Math.cos(cam.yaw), sy = Math.sin(cam.yaw), cp = Math.cos(cam.pitch), sp = Math.sin(cam.pitch);
+    const x1 = x*cy+z*sy, z1 = -x*sy+z*cy, y1 = y*cp-z1*sp, z2 = y*sp+z1*cp, s = Math.min(3, D/Math.max(.05,D-z2));
+    return [w/2+x1*R*s*AX+sh.x, CY+y1*R*s+sh.y, s, z2, D-z2>.4];
+  };
+  const depth = z => Math.max(.2, Math.min(1, .55+.45*z/1.2));
+  function explode(){
+    if(!I || boom) return;
+    document.querySelectorAll('.introtext').forEach(x=>x.classList.add('gone'));
+    if(still){ o.onDone(); return }
+    boom = true; t0 = performance.now();
+  }
+  cv.onpointerdown = e => { drag = {x:e.clientX, y:e.clientY}; moved = 0; try{ cv.setPointerCapture(e.pointerId) }catch(_){} };
+  cv.onpointermove = e => {
+    const b = cv.getBoundingClientRect(); mouse = [e.clientX-b.left, e.clientY-b.top];
+    if(drag){
+      const dx = e.clientX-drag.x, dy = e.clientY-drag.y; drag.x = e.clientX; drag.y = e.clientY; moved += Math.abs(dx)+Math.abs(dy);
+      cam.yaw += dx*.008; cam.pitch = Math.max(-1.2,Math.min(1.2,cam.pitch+dy*.008)); cam.vy = dx*.008;
+    }
+    if(still) frame(0);
+  };
+  cv.onpointerup = () => { if(drag && moved<6 && I) explode(); drag = null };
+  cv.onpointercancel = () => { drag = null };
+  cv.onpointerenter = () => { if(I) target = 1 };
+  cv.onpointerleave = () => { mouse = null; target = 0 };
+  cv.style.cursor = I ? 'pointer' : 'grab';
+  if(I) cv.onkeydown = e => { if(e.key==='Enter'||e.key===' '){ e.preventDefault(); explode() } };
+  function backdrop(k,e){
+    ctx.globalCompositeOperation = 'screen';
+    for(const f of field){
+      const x = (((f.fx + k*.004*f.z + cam.yaw*.03*f.z)%1)+1)%1*w, y = (((f.fy + cam.pitch*.03*f.z)%1)+1)%1*h;
+      ctx.globalAlpha = (.3 + .6*Math.abs(Math.sin(k*1.4+f.ph)))*f.z*(1-e*.5);
+      ctx.drawImage(sprite(f.c), x-f.s*3, y-f.s*3, f.s*6, f.s*6);
+    }
+    const u = (k%8)/.7;
+    if(u<1 && !still){
+      ctx.globalCompositeOperation = 'source-over'; ctx.globalAlpha = (1-u)*.8;
+      const sx = w*.92-u*w*.55, sy = h*.06+u*h*.3, lg = ctx.createLinearGradient(sx,sy,sx+90,sy-40);
+      lg.addColorStop(0,'#fff'); lg.addColorStop(1,'rgba(255,255,255,0)');
+      ctx.strokeStyle = lg; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.moveTo(sx,sy); ctx.lineTo(sx+90,sy-40); ctx.stroke();
+    }
+  }
+  function supernova(k,now){
+    const e = boom ? Math.min(1,(now-t0)/2600) : 0, eas = 1-Math.pow(1-e,3);
+    charge += (target-charge)*.06; sh.x = (Math.random()-.5)*charge*3; sh.y = (Math.random()-.5)*charge*3;
+    const cx = w/2+sh.x, cy = CY+sh.y;
+    backdrop(k,e); ctx.globalCompositeOperation = 'screen';
+    let g = ctx.createRadialGradient(cx,cy,0,cx,cy,R*1.1);
+    g.addColorStop(0,'rgba(120,160,255,.16)'); g.addColorStop(1,'rgba(60,90,200,0)'); ctx.globalAlpha = 1; ctx.fillStyle = g; ctx.fillRect(0,0,w,h);
+    const cr = R*(.13 + .02*Math.sin(k*2.2) + .05*charge)*(1 + eas*2.5);
+    g = ctx.createRadialGradient(cx,cy,0,cx,cy,cr);
+    g.addColorStop(0,'rgba(255,255,255,1)'); g.addColorStop(.2,'rgba(210,225,255,.85)'); g.addColorStop(.55,'rgba(120,160,255,.18)'); g.addColorStop(1,'rgba(60,90,200,0)');
+    ctx.globalAlpha = 1-e*.7; ctx.fillStyle = g; ctx.fillRect(0,0,w,h);
+    ctx.lineWidth = 1;
+    for(const p of parts){
+      const rr = p.r*(1 + .05*Math.sin(k*.9+p.ph) + .03*charge*Math.sin(k*8+p.ph))*(1 + eas*p.v);
+      const [x,y,s,z,ok] = proj(p.d[0]*rr, p.d[1]*rr, p.d[2]*rr); if(!ok) continue;
+      const sz = p.s*R/110*s, al = Math.max(0,(.3 + .7*Math.abs(Math.sin(k*.7+p.ph)))*(1-eas*.85)*(.75+charge*.25)*depth(z));
+      ctx.globalAlpha = al*.35; ctx.drawImage(sprite(p.c), x-sz*3, y-sz*3, sz*6, sz*6);
+      ctx.globalAlpha = al; ctx.strokeStyle = p.c; ctx.beginPath();
+      for(let i=0;i<3;i++){ const th = p.rot+k*.3+i*2.094, px = x+Math.cos(th)*sz*1.7, py = y+Math.sin(th)*sz*1.7; i ? ctx.lineTo(px,py) : ctx.moveTo(px,py) }
+      ctx.closePath(); ctx.stroke();
+    }
+    if(boom){
+      for(let i=0;i<3;i++){
+        const rad = R*(eas*2.8 - i*.4); if(rad<=0) continue;
+        ctx.globalAlpha = (1-e)*.8; ctx.strokeStyle = ['#ffffff','#ffc857','#7aa2f7'][i]; ctx.lineWidth = 3-i*.8;
+        ctx.beginPath(); ctx.arc(cx,cy,rad,0,6.283); ctx.stroke();
+      }
+      if(e<.35){ ctx.globalCompositeOperation = 'source-over'; ctx.globalAlpha = (1-e/.35)*.9; ctx.fillStyle = '#fff'; ctx.fillRect(0,0,w,h) }
+    }
+    if(e>=1 && !done){ done = true; o.onDone(); return true }
+  }
+  const orbit = (t,ez) => {
+    const Ro = 1.08*ez, x = Ro*Math.cos(t), z0 = Ro*Math.sin(t), y = -z0*Math.sin(.45), z = z0*Math.cos(.45), a = -.4;
+    return [x*Math.cos(a)-y*Math.sin(a), x*Math.sin(a)+y*Math.cos(a), z];
+  };
+  function iss(k,ez){
+    const th = k*.32+1, [x,y,s,z] = proj(...orbit(th,ez)), [nx,ny] = proj(...orbit(th+.03,ez));
+    ctx.globalCompositeOperation = 'source-over'; ctx.fillStyle = '#ffc857';
+    for(let j=36;j>0;j--){ const q = proj(...orbit(th-j*.03,ez)); ctx.globalAlpha = (1-j/36)*.5*depth(q[3]); ctx.beginPath(); ctx.arc(q[0],q[1],1.3*q[2],0,6.283); ctx.fill() }
+    const sc = R*.1*s*Math.min(1,ez*1.5), al = depth(z);
+    ctx.save(); ctx.translate(x,y); ctx.rotate(Math.atan2(ny-y,nx-x)); ctx.globalAlpha = al;
+    ctx.fillStyle = '#e6ebf5'; ctx.fillRect(-sc,-.6,2*sc,1.2); ctx.fillRect(-sc*.3,-sc*.09,sc*.6,sc*.18); ctx.fillRect(-sc*.05,-sc*.3,sc*.1,sc*.6);
+    ctx.fillStyle = '#ffb54a'; for(const q of [-1,-.7,.7,1]) ctx.fillRect(q*sc-sc*.07,-sc*.38,sc*.14,sc*.76);
+    ctx.restore();
+    ctx.globalAlpha = al*.85; ctx.fillStyle = '#c5cedd'; ctx.font = `${Math.max(9,R/24)}px 'Space Mono',monospace`; ctx.textAlign = 'left';
+    ctx.fillText('ISS · 408 KM', x+sc*1.2, y-sc*.5);
+  }
+  function hud(k){
+    const m = Math.max(24, Math.min(72, w*.05)), fs = Math.max(9,w/52), t = Math.floor(k), p2 = n => String(n).padStart(2,'0');
+    ctx.globalAlpha = .7; ctx.fillStyle = '#c5cedd'; ctx.font = `${fs}px 'Space Mono',monospace`;
+    const y0 = 92; ctx.textAlign = 'left'; ctx.fillText('OBJ  NOVA-CLUSTER', m, y0); ctx.fillText('ISS  7.66 KM/S', m, y0+fs*1.7);
+    ctx.textAlign = 'right'; ctx.fillText(`T+ ${p2(Math.floor(t/3600))}:${p2(Math.floor(t/60)%60)}:${p2(t%60)}`, w-m, y0);
+    if(w>700){ ctx.textAlign = 'center'; ctx.globalAlpha = .4; ctx.fillText('DRAG TO ROTATE · HOVER A STAR', w/2, y0) }
+  }
+  function cluster(k,s){
+    const ez = 1-Math.pow(1-s,3), br = 1+.015*Math.sin(k*.4), lab = Math.max(0,(ez-.75)/.25), la = Math.max(0,(ez-.6)/.4), hits = [];
+    const P = (x,y,z) => proj(x*ez*br, y*ez*br, z*ez*br);
+    backdrop(k,0); ctx.globalCompositeOperation = 'source-over'; ctx.lineWidth = 1;
+    for(const g of groups) for(const [i,j] of g.ln){
+      const a = P(g.st[i].x,g.st[i].y,g.st[i].z), b = P(g.st[j].x,g.st[j].y,g.st[j].z);
+      ctx.strokeStyle = `rgba(160,190,235,${.36*la*depth((a[3]+b[3])/2)})`; ctx.beginPath(); ctx.moveTo(a[0],a[1]); ctx.lineTo(b[0],b[1]); ctx.stroke();
+    }
+    ctx.globalCompositeOperation = 'screen';
+    for(const g of groups) for(const st of g.st){
+      const [x,y,sc,z] = P(st.x,st.y,st.z), zz = (6+st.m*18)*R/200*sc;
+      ctx.globalAlpha = Math.min(1,.65+.35*Math.sin(k*1.8+st.ph))*depth(z); ctx.drawImage(sprite(st.c), x-zz, y-zz, 2*zz, 2*zz);
+      ctx.drawImage(sprite('#ffffff'), x-zz*.4, y-zz*.4, zz*.8, zz*.8); hits.push([x,y,st.name,z]);
+    }
+    ctx.globalCompositeOperation = 'source-over'; ctx.textAlign = 'center';
+    for(const g of groups){
+      const [tx,ty,,tz] = P(g.cx,g.cy-.36,g.cz), a = P(g.st[0].x,g.st[0].y,g.st[0].z);
+      ctx.globalAlpha = lab*.9*depth(tz); ctx.fillStyle = '#ffc857'; ctx.font = `${Math.max(9,R/26)}px 'Space Mono',monospace`;
+      try{ ctx.letterSpacing = Math.max(1,R/90)+'px' }catch(_){}
+      ctx.fillText(g.t, tx, ty); try{ ctx.letterSpacing = '0px' }catch(_){}
+      ctx.textAlign = 'left'; ctx.globalAlpha = lab*.8*depth(a[3]); ctx.fillStyle = '#c5cedd'; ctx.font = `${Math.max(8,R/30)}px 'Space Grotesk',sans-serif`;
+      ctx.fillText(g.st[0].name, a[0]+R/28, a[1]+R/60); ctx.textAlign = 'center';
+    }
+    if(mouse && lab>.5){
+      let best = null, bd = 24; for(const q of hits){ const d = Math.hypot(q[0]-mouse[0], q[1]-mouse[1]); if(d<bd){ bd = d; best = q } }
+      if(best){
+        ctx.globalAlpha = .9; ctx.strokeStyle = '#fff'; ctx.beginPath(); ctx.arc(best[0],best[1],11,0,6.283); ctx.stroke();
+        ctx.fillStyle = '#fff'; ctx.textAlign = 'left'; ctx.font = `${Math.max(11,R/22)}px 'Space Grotesk',sans-serif`; ctx.fillText(best[2], best[0]+16, best[1]+4);
+      }
+    }
+    iss(k,ez); hud(k);
+  }
+  function frame(now){
+    if(!still){ const bb = cv.getBoundingClientRect(); if(bb.bottom<0||bb.top>innerHeight){ raf = requestAnimationFrame(frame); return } }
+    const k = still ? 0 : now/1000; ctx.setTransform(dpr,0,0,dpr,0,0); ctx.clearRect(0,0,w,h);
+    if(!drag && !still){ cam.yaw += cam.vy; cam.vy += (.0025-cam.vy)*.02; cam.pitch += (-.15-cam.pitch)*.004 }
+    if(I){ if(supernova(k,now)) return }
+    else { if(born===null) born = now; cluster(k, still ? 1 : Math.min(1,(now-born)/2600)) }
+    ctx.globalAlpha = 1; ctx.globalCompositeOperation = 'source-over';
+    if(!still) raf = requestAnimationFrame(frame);
+  }
+  raf = requestAnimationFrame(frame);
+}
+let rt;
+function stage(){
+  window.onresize = () => { clearTimeout(rt); rt = setTimeout(() => { if(scr!=='play' && $('nova')) stage() }, 250) };
+  cancelAnimationFrame(raf); const cv = $('nova');
+  if(cv){ if(!parts.length) initParts(); if(!groups.length) buildCluster(); nova(cv, {interactive: scr==='intro', onDone: () => { scr = 'menu'; draw() }}) }
+}
+
+function forecast(){
+  if(!P.solar(S.day)) return ['red','Lunar night','No sunlight today. Solar panels will make no power.'];
+  if(P.solar(S.day) && !P.solar(S.day+2)) return ['amber','Warning','Lunar night starts in 2 days. Build up power now.'];
+  if(S.next==='storm') return ['amber','Forecast','Dust storm. Solar panels will make far less power.'];
+  if(S.next==='flare') return ['red','Forecast',`Solar flare. A shield of ${P.dose} or more blocks it fully.`];
+  return ['green','Forecast','Clear skies.'];
+}
+
+// ---------- CREW ALLOCATOR VISUALS ----------
+const TC = {pw:'--pw',o2:'--o2',fd:'--fd',sh:'--sh',rs:'--ok'};
+const SV = d => `<svg viewBox="0 0 24 24" aria-hidden="true">${d}</svg>`;
+const ICONS = {
+  pw: SV('<path d="M3 7h18l-2 9H5zM12 7v9M7.5 7 7 16M16.5 7l.5 9M12 16v4M8 20h8"/>'),
+  o2: SV('<path d="M12 3c3 4 6 7 6 10a6 6 0 0 1-12 0c0-3 3-6 6-10z"/>'),
+  fd: SV('<path d="M5 19C5 10 10 5 19 5c0 9-5 14-14 14zM5 19l8-8"/>'),
+  sh: SV('<path d="M12 3l7 3v6c0 4.5-3 7.500-7 9-4-1.500-7-4.500-7-9V6z"/>'),
+  rs: SV('<path d="M12 20s-7-4.500-7-10a4 4 0 0 1 7-2.500A4 4 0 0 1 19 10c0 5.500-7 10-7 10z"/>')};
+const HELM = '<svg viewBox="0 0 32 32"><circle cx="16" cy="16" r="13" fill="none" stroke="currentColor" stroke-width="1.6"/><rect class="v" x="8" y="11" width="16" height="10" rx="5" fill="rgba(255,255,255,.15)"/></svg>';
+function setA(k,n){ if(A[k]===n) n--; if(used()-A[k]+n>CREW) return; A[k] = n; draw() }
+function preview(k){
+  const n = A[k], sm = P.solar(S.day)*(S.next==='storm'?BASE.stormSolar:1);
+  const v = {pw:Math.round(n*BASE.make.pw*sm), o2:n*BASE.make.o2, fd:n*BASE.make.fd, sh:n*BASE.make.sh, rs:n*BASE.make.rs}[k];
+  const u = {pw:'power',o2:'oxygen',fd:'food',sh:'shield',rs:'health'}[k];
+  return `+${v} ${u}${k==='o2'&&n?` · −${n*BASE.o2Power} power`:''}`;
+}
+function menuHTML(){
+  return `<p class="lab amber">Mission briefing</p>
+  <h2 class="statement"><b>Keep ${CREW} astronauts alive</b> for ${cfg.days} days on ${PLANETS[cfg.planet].name}, on ${cfg.diff} difficulty.</h2>
+  <p class="lead">Each day you assign your crew to jobs, read the forecast, and balance power, oxygen, food and radiation shielding. Storms, flares and lunar nights will test your plan.</p>
+  <div class="opt"><span class="idx">01</span><div class="ttl"><b>World</b><small>Where is your outpost?</small></div>${seg('planet',[['mars','Mars'],['moon','The Moon']])}</div>
+  <div class="opt"><span class="idx">02</span><div class="ttl"><b>Difficulty</b><small>How harsh are the hazards?</small></div>${seg('diff',[['easy','Easy'],['normal','Normal'],['hard','Hard']])}</div>
+  <div class="opt"><span class="idx">03</span><div class="ttl"><b>Length</b><small>Days to survive</small></div><div>${seg('days',[[10,'10'],[20,'20'],[30,'30'],[60,'60']])}
+  <p class="log">Or type your own (5 to 100): <input type="number" min="5" max="100" value="${cfg.days}" aria-label="Number of days" onchange="setDays(this.value)"></p></div></div>
+  <div class="go"><button class="cta" onclick="start()">Start mission</button><span class="log">Best score here: ${getBest()}</span></div>`;
+}
 function draw(){
-  const el = $('app');
+  const el = $('app'), cap = s => s[0].toUpperCase()+s.slice(1), isI = scr==='intro';
+  const stageHTML = (label, title, sub) => `<section class="stage">${NAV}
+    <canvas id="nova" ${isI?'tabindex="0" role="button" aria-label="Supernova. Drag to rotate it, press to make it explode and start the game"':'role="img" aria-label="Interactive 3D star cluster with named constellations and the International Space Station. Drag to rotate."'}></canvas>
+    <div class="cap ${isI?'introtext':''}"><p class="lab amber">${label}</p><h1 class="mega">${title}</h1>${sub}</div></section>`;
+  if(isI){
+    el.innerHTML = stageHTML('Junior astronaut mission trainer','<b>Ignite</b> a supernova.','<p class="hint">Drag to rotate · tap the star to begin</p>'); stage(); return;
+  }
   if(scr === 'menu'){
-    el.innerHTML = `<h1>Junior Astronaut Mission Trainer</h1>
-    <p>Keep ${CREW} astronauts alive at an outpost for ${cfg.days} days. Each day, assign your crew to jobs, then end the day. Watch the forecast!</p>
-    <div class="card"><h2>Choose a world</h2>${seg('planet',[['mars','Mars'],['moon','The Moon']])}
-    <h2>Choose a difficulty</h2>${seg('diff',[['easy','Easy'],['normal','Normal'],['hard','Hard']])}
-    <h2>Choose mission length (days)</h2>${seg('days',[[10,'10'],[20,'20'],[30,'30'],[60,'60']])}
-    <label class="log">Or type your own (5 to 100): <input type="number" min="5" max="100" value="${cfg.days}" onchange="setDays(this.value)"></label>
-    <p class="log">Best score here: ${getBest()}</p><button onclick="start()">Start mission</button></div>`;
-    return;
+    el.innerHTML = stageHTML('NASA Space Apps 2026','<b>Junior Astronaut</b><br>Mission Trainer','<a class="scroll" href="#menu">Scroll to begin ↓</a>') + `<section id="menu" class="menu">${menuHTML()}</section>`;
+    stage(); return;
   }
   if(scr !== 'play'){
-    const w = scr==='win';
-    el.innerHTML = `<h1>${w?'Mission complete!':'Mission over'}</h1>
-    <div class="card"><p>${w?`Your crew survived all ${goal()} days on ${P.name}.`:`The crew could not go on after ${S.done} ${P.unit}${S.done===1?'':'s'}.`}</p>
-    <h2>Score: ${score()}${S.newBest?' (new best!)':''}</h2><p class="log">Best score here: ${getBest()}</p></div>
-    <div class="card"><h2>Resources over time</h2>${chart()}</div>
-    <div class="card"><h2>What happened</h2><ul>${debrief()}</ul></div>
-    <button onclick="start()">Play again</button> <button class="alt" onclick="scr='menu';draw()">Change settings</button>`;
-    return;
+    const w = scr==='win'; scrollTo({top:0,behavior:'instant'});
+    el.innerHTML = stageHTML('Mission report', `<b>Mission</b> ${w?'complete.':'over.'}`, '<a class="scroll" href="#menu">Scroll for your report ↓</a>') + `<section id="menu" class="menu">
+    <p class="lab amber">Final score</p><h2 class="statement"><b>${score()}</b>${S.newBest?' · new best':''}</h2>
+    <p class="lead" style="margin-bottom:24px">${w?`Your crew survived all ${goal()} days on ${P.name}.`:`The crew could not go on after ${S.done} ${P.unit}${S.done===1?'':'s'}.`}</p><p class="log">Best score here: ${getBest()}</p>
+    <section class="sec"><h2>Resources over time</h2>${chart()}</section>
+    <section class="sec"><h2>What happened</h2><ul>${debrief()}</ul></section>
+    <div class="go"><button class="cta" onclick="start()">Play again</button><button class="alt" onclick="scr='menu';draw();scrollTo({top:0,behavior:'instant'})">Change settings</button></div></section>`;
+    stage(); return;
   }
-  const lunarSoon = P.solar(S.day) && !P.solar(S.day+2);
-  const f = !P.solar(S.day) ? '<div class="alert bad"><b>Lunar night:</b> no sunlight today. Solar panels will make no power.</div>'
-    : lunarSoon ? '<div class="alert"><b>Warning:</b> lunar night starts in 2 days. Build up power now.</div>'
-    : S.next==='storm' ? '<div class="alert"><b>Forecast:</b> dust storm. Solar panels will make far less power.</div>'
-    : S.next==='flare' ? `<div class="alert bad"><b>Forecast:</b> solar flare. A shield of ${P.dose} or more blocks it fully.</div>`
-    : '<div class="alert good"><b>Forecast:</b> clear skies.</div>';
-  const u = k => Math.round(BASE.use[k]*D.use);
-  el.innerHTML = `<div class="top"><h1>Mission: ${P.name}</h1><span class="log">Difficulty: ${cfg.diff}</span></div>
-  <div class="card"><div class="top"><h2>${P.unit[0].toUpperCase()+P.unit.slice(1)} ${S.day} of ${goal()}</h2><span class="log">Crew assigned: ${used()} / ${CREW}</span></div>
+  cancelAnimationFrame(raf);
+  const f = forecast(), u = k => Math.round(BASE.use[k]*D.use);
+  el.innerHTML = `${NAV}<section class="play">
+  <p class="lab amber">Mission: ${P.name} · ${cfg.diff}</p>
+  <h1 class="h">${cap(P.unit)} ${S.day} <span class="ash">of ${goal()}</span></h1>
   ${bar('Power',S.pw,'--pw')}${bar('Oxygen',S.o2,'--o2')}${bar('Food',S.fd,'--fd')}${bar('Shield',S.sh,'--sh')}${bar('Crew health',S.hp,'--ok')}
-  <p class="log">Each ${P.unit} the base uses ${u('pw')} power, ${u('o2')} oxygen and ${u('fd')} food. Shield slowly wears down.</p></div>${f}
-  <div class="card"><h2>Assign your crew</h2>${TASKS.map(t=>`<div class="task"><div><b>${t.n}</b><small>${t.d}</small></div>
-  <button class="step alt" aria-label="Remove one from ${t.n}" onclick="adj('${t.k}',-1)">−</button><span class="n">${A[t.k]}</span>
-  <button class="step alt" aria-label="Add one to ${t.n}" onclick="adj('${t.k}',1)">+</button></div>`).join('')}
-  <p><button onclick="endDay()" ${used()<CREW?'disabled':''}>End ${P.unit} ${S.day}</button>${used()<CREW?` <span class="log">Assign all ${CREW} crew first.</span>`:''}</p></div>
-  <div class="card log" aria-live="polite"><b>Last ${P.unit}:</b><br>${S.log.length?S.log.join('<br>'):'Nothing yet. Make your first plan.'}</div>`;
+  <p class="log" style="margin-top:18px">Each ${P.unit} the base uses ${u('pw')} power, ${u('o2')} oxygen and ${u('fd')} food. Shield slowly wears down.</p>
+  <p class="sec" style="margin:36px 0"><span class="lab ${f[0]}">${f[1]}</span>${f[2]}</p>
+  <div class="top"><h2>Assign your crew</h2><span class="log">${CREW-used()} free · tap the squares to assign</span></div>
+  <div class="crew" aria-hidden="true">${Array.from({length:CREW},(_,i)=>`<span class="hm ${i<CREW-used()?'free':''}">${HELM}</span>`).join('')}</div>
+  ${TASKS.map(t=>`<div class="task ${A[t.k]?'act':''}" style="--c:var(${TC[t.k]})"><span class="ic">${ICONS[t.k]}</span>
+  <div><b>${t.n}</b><small>${t.d}</small><em class="pv">${preview(t.k)}</em></div>
+  <div class="pips" role="group" aria-label="Crew on ${t.n}">${Array.from({length:CREW},(_,i)=>i+1).map(n=>`<button class="pip ${A[t.k]>=n?'on':''}" aria-label="Set ${t.n} crew to ${n}" aria-pressed="${A[t.k]>=n}" onclick="setA('${t.k}',${n})"></button>`).join('')}</div></div>`).join('')}
+  <p style="margin-top:24px"><button onclick="endDay()" ${used()<CREW?'disabled':''}>End ${P.unit} ${S.day}</button>${used()<CREW?` <span class="log">&nbsp;Assign all ${CREW} crew first.</span>`:''}</p>
+  <div class="sec log" aria-live="polite"><span class="lab">Last ${P.unit}</span>${S.log.length?S.log.join('<br>'):'Nothing yet. Make your first plan.'}</div></section>`;
 }
 draw();
 </script></body></html>
