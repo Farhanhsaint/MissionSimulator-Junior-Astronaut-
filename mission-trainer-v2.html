@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Junior Astronaut Mission Trainer</title>
+<style>
+:root{--bg:#f6ecdf;--card:#fffaf2;--ink:#2b1a14;--mute:#7a5f52;--line:#e2cdb8;--acc:#c4471f;--ok:#1f8a6e;--bad:#b3261e;--pw:#d9950f;--o2:#2a7fb8;--fd:#5a9a2b;--sh:#7b5ea7}
+@media (prefers-color-scheme:dark){:root{--bg:#1c1210;--card:#2a1c18;--ink:#f6e6d2;--mute:#c2a591;--line:#4a3129;--acc:#ff7a4d;--ok:#4fd1a5;--bad:#ff8a80;--pw:#f2b73d;--o2:#6cb8ee;--fd:#8fcf58;--sh:#b79be0}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 system-ui,sans-serif;padding:env(safe-area-inset-top,0) 0 env(safe-area-inset-bottom,0)}
+main{max-width:720px;margin:0 auto;padding:16px}
+h1,h2{margin:0;line-height:1.15}h1{font-size:1.8rem}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin:12px 0}
+.bar{height:14px;background:var(--line);border-radius:7px;overflow:hidden;flex:1}.bar i{display:block;height:100%;transition:width .4s}
+.row{display:flex;align-items:center;gap:10px;margin:8px 0}.row b{width:100px;flex:none}.row span{width:40px;text-align:right}
+button{font:inherit;font-weight:700;border:0;border-radius:10px;padding:10px 16px;background:var(--acc);color:#fff;cursor:pointer}
+button:focus-visible{outline:3px solid var(--ink);outline-offset:2px}button:disabled{opacity:.4;cursor:default}
+button.alt{background:var(--line);color:var(--ink)}button.on{background:var(--ink);color:var(--bg)}
+.step{width:38px;height:38px;padding:0}
+.task{display:flex;align-items:center;gap:10px;padding:8px 0;border-top:1px solid var(--line)}.task:first-of-type{border:0}
+.task div{flex:1}.task small{color:var(--mute);display:block}.n{width:24px;text-align:center;font-weight:700}
+.alert{border-left:6px solid var(--pw);padding:8px 12px;background:var(--card);border-radius:8px;margin:10px 0}
+.alert.bad{border-color:var(--bad)}.alert.good{border-color:var(--ok)}
+.log{color:var(--mute);font-size:.92rem}.top{display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:wrap}
+.seg{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0}
+.chart{overflow-x:auto}.chart svg{width:100%;min-width:420px;height:auto}
+input{font:inherit;width:5em;padding:6px;border-radius:8px;border:1px solid var(--line);background:var(--card);color:var(--ink)}
+.leg{display:flex;gap:14px;flex-wrap:wrap;font-size:.9rem}.leg i{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:5px}
+</style></head><body><main id="app"></main>
+<script>
+// ---------- CONFIG: every number that shapes the game lives here ----------
+const CREW = 4;
+const goal = () => cfg.days;
+const BASE = { use:{pw:12,o2:10,fd:9}, make:{pw:10,o2:10,fd:9,sh:7,rs:4}, o2Power:2, decay:1,
+  start:{pw:60,o2:60,fd:60,sh:25,hp:100}, shortageDamage:15, stormSolar:0.3 };
+const PLANETS = {
+  mars:{name:'Mars', unit:'sol', stormP:.16, flareP:.14, dose:45, solar:()=>1,
+    stormFact:'Fact: a global dust storm in 2018 blocked so much sunlight that the Opportunity rover lost power.',
+    flareFact:'Fact: Mars has almost no magnetic field, so bases need shielding against solar flares.'},
+  moon:{name:'the Moon', unit:'day', stormP:0, flareP:.2, dose:55, solar:d=>{const g=cfg.days,a=Math.round(g/3);return (d>a&&d<=a+Math.max(3,Math.round(g/3)))?0:1},
+    stormFact:'', flareFact:'Fact: the Moon has no atmosphere, so radiation from flares reaches the surface directly.',
+    nightFact:'Fact: a lunar night lasts about 14 Earth days, so landers need batteries or nuclear power.'}
+};
+const DIFFS = { easy:{use:.8,haz:.7}, normal:{use:1,haz:1}, hard:{use:1.15,haz:1.4} };
+const TASKS = [
+  {k:'pw',n:'Solar panels',d:'+10 power each'},
+  {k:'o2',n:'Oxygen maker',d:'+10 oxygen each, costs 2 power'},
+  {k:'fd',n:'Greenhouse',d:'+9 food each'},
+  {k:'sh',n:'Radiation wall',d:'+7 shield each'},
+  {k:'rs',n:'Rest & exercise',d:'+4 crew health each'}];
+const COLORS = {pw:'--pw',o2:'--o2',fd:'--fd',sh:'--sh',hp:'--ok'};
+const NAMES = {pw:'Power',o2:'Oxygen',fd:'Food',sh:'Shield',hp:'Health'};
+
+// ---------- STATE ----------
+let cfg = {planet:'mars', diff:'normal', days:30}, scr = 'menu', S, A, P, D;
+const $ = id => document.getElementById(id);
+const used = () => Object.values(A).reduce((a,b)=>a+b,0);
+const bestKey = () => `best-${cfg.planet}-${cfg.diff}-${cfg.days}`;
+function getBest(){ try{ return +localStorage.getItem(bestKey())||0 }catch(e){ return 0 } }
+function setBest(v){ try{ localStorage.setItem(bestKey(), v) }catch(e){} }
+
+function start(){
+  P = PLANETS[cfg.planet]; D = DIFFS[cfg.diff];
+  S = {day:1, ...BASE.start, done:0, log:[], hist:[], short:{pw:[],o2:[],fd:[]}, flares:[], storms:0, nights:0, newBest:false};
+  S.hist.push({...BASE.start}); S.next = roll(); resetA(); scr = 'play'; draw();
+}
+function resetA(){ A = {pw:0,o2:0,fd:0,sh:0,rs:0} }
+function roll(){
+  const r = Math.random();
+  if(r < P.stormP*D.haz) return 'storm';
+  if(r < (P.stormP+P.flareP)*D.haz) return 'flare';
+  return 'calm';
+}
+function adj(k,d){ if(d>0&&used()>=CREW) return; if(d<0&&A[k]<=0) return; A[k]+=d; draw() }
+
+// ---------- GAME LOGIC ----------
+function endDay(){
+  const ev = S.next, L = [], sunny = P.solar(S.day);
+  let sm = sunny * (ev==='storm' ? BASE.stormSolar : 1);
+  const use = {}; for(const k in BASE.use) use[k] = Math.round(BASE.use[k]*D.use);
+  if(ev==='storm'){ S.storms++; L.push(`Dust storm! Solar panels made only ${BASE.stormSolar*100}% of their power.`, P.stormFact) }
+  if(!sunny){ S.nights++; L.push('Lunar night: no sunlight, so solar panels made no power.') }
+  S.pw += A.pw*BASE.make.pw*sm - use.pw - A.o2*BASE.o2Power;
+  S.o2 += A.o2*BASE.make.o2 - use.o2;
+  S.fd += A.fd*BASE.make.fd - use.fd;
+  S.sh = Math.min(100, S.sh + A.sh*BASE.make.sh - BASE.decay);
+  let dmg = 0;
+  if(ev==='flare'){
+    const hit = Math.max(0, P.dose - S.sh), loss = Math.ceil(hit/2);
+    dmg += loss; S.flares.push({day:S.day, loss});
+    L.push(loss ? `Solar flare! The shield stopped some of it, but the crew lost ${loss} health.` : 'Solar flare! Your shield blocked all of it.', P.flareFact);
+  }
+  for(const k of ['pw','o2','fd']){
+    if(S[k] < 0){ S[k] = 0; dmg += BASE.shortageDamage; S.short[k].push(S.day); L.push(`Out of ${NAMES[k].toLowerCase()}! The crew lost ${BASE.shortageDamage} health.`) }
+    S[k] = Math.min(100, S[k]);
+  }
+  S.hp = Math.min(100, S.hp - dmg + A.rs*BASE.make.rs);
+  S.log = L.length ? L : ['A quiet day. Good work.'];
+  S.hist.push({pw:S.pw, o2:S.o2, fd:S.fd, sh:S.sh, hp:Math.max(0,S.hp)});
+  if(S.hp <= 0){ S.hp = 0; finish('lose') }
+  else { S.done++; if(S.day >= goal()) finish('win'); else { S.day++; S.next = roll(); resetA() } }
+  draw();
+}
+function score(){ return S.done*10 + Math.round(S.hp) }
+function finish(r){
+  scr = r; const sc = score();
+  if(sc > getBest()){ setBest(sc); S.newBest = true }
+}
+
+// ---------- DEBRIEF ----------
+function debrief(){
+  const T = [], names = {pw:'power',o2:'oxygen',fd:'food'};
+  for(const k in S.short) if(S.short[k].length) T.push(`You ran out of ${names[k]} on ${P.unit}${S.short[k].length>1?'s':''} ${S.short[k].join(', ')}. Try assigning more crew to it before the stock gets low.`);
+  const hurt = S.flares.filter(f=>f.loss);
+  if(hurt.length) T.push(`Solar flares hurt the crew on ${P.unit} ${hurt.map(f=>f.day).join(', ')}. Build the radiation wall up to ${P.dose} when a flare is forecast.`);
+  else if(S.flares.length) T.push(`Your shield protected the crew from ${S.flares.length} flare${S.flares.length>1?'s':''}.`);
+  if(S.storms) T.push(`${S.storms} dust storm${S.storms>1?'s':''} cut your solar power. Storing extra power beforehand is the fix.`);
+  if(S.nights) T.push(`The lunar night lasted ${S.nights} days with no solar power. Planning ahead is what keeps a base alive.`);
+  if(!T.length) T.push('No shortages and no radiation damage. Excellent planning!');
+  return T.map(t=>`<li>${t}</li>`).join('');
+}
+
+// ---------- CHART (plain SVG, no library) ----------
+function chart(){
+  const W=640, H=200, p=28, n=S.hist.length, x=i=>p+(n<2?0:i*(W-2*p)/(n-1)), y=v=>H-p-(v/100)*(H-2*p);
+  let g = [0,50,100].map(v=>`<line x1="${p}" x2="${W-p}" y1="${y(v)}" y2="${y(v)}" style="stroke:var(--line)"/><text x="2" y="${y(v)+4}" font-size="11" style="fill:var(--mute)">${v}</text>`).join('');
+  for(const k in COLORS){
+    const pts = S.hist.map((h,i)=>`${x(i)},${y(Math.max(0,Math.min(100,h[k])))}`).join(' ');
+    g += `<polyline points="${pts}" fill="none" stroke-width="2.5" style="stroke:var(${COLORS[k]})"/>`;
+  }
+  const leg = Object.keys(COLORS).map(k=>`<span><i style="background:var(${COLORS[k]})"></i>${NAMES[k]}</span>`).join('');
+  return `<div class="chart"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Line chart of resources over time">${g}</svg></div><div class="leg">${leg}</div>`;
+}
+
+// ---------- SCREENS ----------
+const bar = (l,v,c) => `<div class="row"><b>${l}</b><div class="bar"><i style="width:${Math.max(0,v)}%;background:var(${c})"></i></div><span>${Math.round(v)}</span></div>`;
+function setCfg(k,v){ cfg[k] = k==='days' ? +v : v; draw() }
+function setDays(v){ cfg.days = Math.max(5, Math.min(100, Math.round(+v)||30)); draw() }
+function seg(key, opts){ return `<div class="seg">${opts.map(([v,l])=>`<button class="${cfg[key]===v?'on':'alt'}" aria-pressed="${cfg[key]===v}" onclick="setCfg('${key}','${v}')">${l}</button>`).join('')}</div>` }
+
+function draw(){
+  const el = $('app');
+  if(scr === 'menu'){
+    el.innerHTML = `<h1>Junior Astronaut Mission Trainer</h1>
+    <p>Keep ${CREW} astronauts alive at an outpost for ${cfg.days} days. Each day, assign your crew to jobs, then end the day. Watch the forecast!</p>
+    <div class="card"><h2>Choose a world</h2>${seg('planet',[['mars','Mars'],['moon','The Moon']])}
+    <h2>Choose a difficulty</h2>${seg('diff',[['easy','Easy'],['normal','Normal'],['hard','Hard']])}
+    <h2>Choose mission length (days)</h2>${seg('days',[[10,'10'],[20,'20'],[30,'30'],[60,'60']])}
+    <label class="log">Or type your own (5 to 100): <input type="number" min="5" max="100" value="${cfg.days}" onchange="setDays(this.value)"></label>
+    <p class="log">Best score here: ${getBest()}</p><button onclick="start()">Start mission</button></div>`;
+    return;
+  }
+  if(scr !== 'play'){
+    const w = scr==='win';
+    el.innerHTML = `<h1>${w?'Mission complete!':'Mission over'}</h1>
+    <div class="card"><p>${w?`Your crew survived all ${goal()} days on ${P.name}.`:`The crew could not go on after ${S.done} ${P.unit}${S.done===1?'':'s'}.`}</p>
+    <h2>Score: ${score()}${S.newBest?' (new best!)':''}</h2><p class="log">Best score here: ${getBest()}</p></div>
+    <div class="card"><h2>Resources over time</h2>${chart()}</div>
+    <div class="card"><h2>What happened</h2><ul>${debrief()}</ul></div>
+    <button onclick="start()">Play again</button> <button class="alt" onclick="scr='menu';draw()">Change settings</button>`;
+    return;
+  }
+  const lunarSoon = P.solar(S.day) && !P.solar(S.day+2);
+  const f = !P.solar(S.day) ? '<div class="alert bad"><b>Lunar night:</b> no sunlight today. Solar panels will make no power.</div>'
+    : lunarSoon ? '<div class="alert"><b>Warning:</b> lunar night starts in 2 days. Build up power now.</div>'
+    : S.next==='storm' ? '<div class="alert"><b>Forecast:</b> dust storm. Solar panels will make far less power.</div>'
+    : S.next==='flare' ? `<div class="alert bad"><b>Forecast:</b> solar flare. A shield of ${P.dose} or more blocks it fully.</div>`
+    : '<div class="alert good"><b>Forecast:</b> clear skies.</div>';
+  const u = k => Math.round(BASE.use[k]*D.use);
+  el.innerHTML = `<div class="top"><h1>Mission: ${P.name}</h1><span class="log">Difficulty: ${cfg.diff}</span></div>
+  <div class="card"><div class="top"><h2>${P.unit[0].toUpperCase()+P.unit.slice(1)} ${S.day} of ${goal()}</h2><span class="log">Crew assigned: ${used()} / ${CREW}</span></div>
+  ${bar('Power',S.pw,'--pw')}${bar('Oxygen',S.o2,'--o2')}${bar('Food',S.fd,'--fd')}${bar('Shield',S.sh,'--sh')}${bar('Crew health',S.hp,'--ok')}
+  <p class="log">Each ${P.unit} the base uses ${u('pw')} power, ${u('o2')} oxygen and ${u('fd')} food. Shield slowly wears down.</p></div>${f}
+  <div class="card"><h2>Assign your crew</h2>${TASKS.map(t=>`<div class="task"><div><b>${t.n}</b><small>${t.d}</small></div>
+  <button class="step alt" aria-label="Remove one from ${t.n}" onclick="adj('${t.k}',-1)">−</button><span class="n">${A[t.k]}</span>
+  <button class="step alt" aria-label="Add one to ${t.n}" onclick="adj('${t.k}',1)">+</button></div>`).join('')}
+  <p><button onclick="endDay()" ${used()<CREW?'disabled':''}>End ${P.unit} ${S.day}</button>${used()<CREW?` <span class="log">Assign all ${CREW} crew first.</span>`:''}</p></div>
+  <div class="card log" aria-live="polite"><b>Last ${P.unit}:</b><br>${S.log.length?S.log.join('<br>'):'Nothing yet. Make your first plan.'}</div>`;
+}
+draw();
+</script></body></html>
