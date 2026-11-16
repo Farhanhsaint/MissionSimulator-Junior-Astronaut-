@@ -4,15 +4,19 @@
 <title>Junior Astronaut Mission Trainer</title>
 <style>
 :root{--bg:#f6ecdf;--card:#fffaf2;--ink:#2b1a14;--mute:#7a5f52;--line:#e2cdb8;--acc:#c4471f;--ok:#1f8a6e;--bad:#b3261e;--pw:#d9950f;--o2:#2a7fb8;--fd:#5a9a2b;--sh:#7b5ea7}
-@media (prefers-color-scheme:dark){:root{--bg:#1c1210;--card:#2a1c18;--ink:#f6e6d2;--mute:#c2a591;--line:#4a3129;--acc:#ff7a4d;--ok:#4fd1a5;--bad:#ff8a80;--pw:#f2b73d;--o2:#6cb8ee;--fd:#8fcf58;--sh:#b79be0}}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#1c1210;--card:#2a1c18;--ink:#f6e6d2;--mute:#c2a591;--line:#4a3129;--acc:#ff7a4d;--ok:#4fd1a5;--bad:#ff8a80;--pw:#f2b73d;--o2:#6cb8ee;--fd:#8fcf58;--sh:#b79be0}}
+:root[data-theme="dark"]{--bg:#1c1210;--card:#2a1c18;--ink:#f6e6d2;--mute:#c2a591;--line:#4a3129;--acc:#ff7a4d;--ok:#4fd1a5;--bad:#ff8a80;--pw:#f2b73d;--o2:#6cb8ee;--fd:#8fcf58;--sh:#b79be0}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 system-ui,sans-serif;padding:env(safe-area-inset-top,0) 0 env(safe-area-inset-bottom,0)}
 main{max-width:720px;margin:0 auto;padding:16px}
 h1,h2{margin:0;line-height:1.15}h1{font-size:1.8rem}
 .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin:12px 0}
-.bar{height:14px;background:var(--line);border-radius:7px;overflow:hidden;flex:1}.bar i{display:block;height:100%;transition:width .4s}
+.bar{height:14px;background:var(--line);border-radius:7px;overflow:hidden;flex:1}
+.bar i{display:block;height:100%;transition:width .5s cubic-bezier(.34,1.56,.64,1)}
 .row{display:flex;align-items:center;gap:10px;margin:8px 0}.row b{width:100px;flex:none}.row span{width:40px;text-align:right}
-button{font:inherit;font-weight:700;border:0;border-radius:10px;padding:10px 16px;background:var(--acc);color:#fff;cursor:pointer}
+button{font:inherit;font-weight:700;border:0;border-radius:10px;padding:10px 16px;background:var(--acc);color:#fff;cursor:pointer;transition:transform .15s,filter .15s}
+button:active{transform:scale(.94)}
+button:hover:not(:disabled){filter:brightness(1.08)}
 button:focus-visible{outline:3px solid var(--ink);outline-offset:2px}button:disabled{opacity:.4;cursor:default}
 button.alt{background:var(--line);color:var(--ink)}button.on{background:var(--ink);color:var(--bg)}
 .step{width:38px;height:38px;padding:0}
@@ -25,6 +29,14 @@ button.alt{background:var(--line);color:var(--ink)}button.on{background:var(--in
 .chart{overflow-x:auto}.chart svg{width:100%;min-width:420px;height:auto}
 input{font:inherit;width:5em;padding:6px;border-radius:8px;border:1px solid var(--line);background:var(--card);color:var(--ink)}
 .leg{display:flex;gap:14px;flex-wrap:wrap;font-size:.9rem}.leg i{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:5px}
+#app{animation:fadein .35s ease}
+@keyframes fadein{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-6px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}
+.hurt{animation:shake .35s}
+.confetti{position:relative;height:0;overflow:visible}
+.confetti i{position:absolute;top:-10px;width:8px;height:14px;opacity:0;border-radius:2px;animation:fall 2.2s ease-in forwards}
+@keyframes fall{0%{opacity:1;transform:translateY(0) rotate(0deg)}100%{opacity:0;transform:translateY(220px) rotate(360deg)}}
+.themebtn{position:fixed;top:calc(env(safe-area-inset-top,0px) + 10px);right:10px;padding:6px 10px;font-size:.85rem;z-index:10}
 </style></head><body><main id="app"></main>
 <script>
 // ---------- CONFIG: every number that shapes the game lives here ----------
@@ -58,9 +70,30 @@ const bestKey = () => `best-${cfg.planet}-${cfg.diff}-${cfg.days}`;
 function getBest(){ try{ return +localStorage.getItem(bestKey())||0 }catch(e){ return 0 } }
 function setBest(v){ try{ localStorage.setItem(bestKey(), v) }catch(e){} }
 
+// ---------- THEME ----------
+function initTheme(){
+  try{
+    const saved = localStorage.getItem('theme');
+    if(saved==='dark' || saved==='light') document.documentElement.dataset.theme = saved;
+  }catch(e){}
+}
+function toggleTheme(){
+  const cur = document.documentElement.dataset.theme ||
+    (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+  const next = cur === 'dark' ? 'light' : 'dark';
+  document.documentElement.dataset.theme = next;
+  try{ localStorage.setItem('theme', next) }catch(e){}
+  draw();
+}
+function themeBtn(){
+  const cur = document.documentElement.dataset.theme ||
+    (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+  return `<button class="alt themebtn" onclick="toggleTheme()" aria-label="Toggle light or dark theme">${cur==='dark'?'☀️ Light':'🌙 Dark'}</button>`;
+}
+
 function start(){
   P = PLANETS[cfg.planet]; D = DIFFS[cfg.diff];
-  S = {day:1, ...BASE.start, done:0, log:[], hist:[], short:{pw:[],o2:[],fd:[]}, flares:[], storms:0, nights:0, newBest:false};
+  S = {day:1, ...BASE.start, done:0, log:[], hist:[], short:{pw:[],o2:[],fd:[]}, flares:[], storms:0, nights:0, newBest:false, tookDamage:false};
   S.hist.push({...BASE.start}); S.next = roll(); resetA(); scr = 'play'; draw();
 }
 function resetA(){ A = {pw:0,o2:0,fd:0,sh:0,rs:0} }
@@ -93,6 +126,7 @@ function endDay(){
     if(S[k] < 0){ S[k] = 0; dmg += BASE.shortageDamage; S.short[k].push(S.day); L.push(`Out of ${NAMES[k].toLowerCase()}! The crew lost ${BASE.shortageDamage} health.`) }
     S[k] = Math.min(100, S[k]);
   }
+  S.tookDamage = dmg > 0;
   S.hp = Math.min(100, S.hp - dmg + A.rs*BASE.make.rs);
   S.log = L.length ? L : ['A quiet day. Good work.'];
   S.hist.push({pw:S.pw, o2:S.o2, fd:S.fd, sh:S.sh, hp:Math.max(0,S.hp)});
@@ -119,6 +153,19 @@ function debrief(){
   return T.map(t=>`<li>${t}</li>`).join('');
 }
 
+// ---------- CONFETTI ----------
+function confetti(){
+  const colors = ['--pw','--o2','--fd','--sh','--ok','--acc'];
+  const pieces = Array.from({length:24}, (_,i) => {
+    const left = Math.round(Math.random()*96)+2;
+    const delay = (Math.random()*0.6).toFixed(2);
+    const dur = (1.6 + Math.random()*1.2).toFixed(2);
+    const c = colors[i % colors.length];
+    return `<i style="left:${left}%;background:var(${c});animation-delay:${delay}s;animation-duration:${dur}s"></i>`;
+  }).join('');
+  return `<div class="confetti">${pieces}</div>`;
+}
+
 // ---------- CHART (plain SVG, no library) ----------
 function chart(){
   const W=640, H=200, p=28, n=S.hist.length, x=i=>p+(n<2?0:i*(W-2*p)/(n-1)), y=v=>H-p-(v/100)*(H-2*p);
@@ -140,7 +187,7 @@ function seg(key, opts){ return `<div class="seg">${opts.map(([v,l])=>`<button c
 function draw(){
   const el = $('app');
   if(scr === 'menu'){
-    el.innerHTML = `<h1>Junior Astronaut Mission Trainer</h1>
+    el.innerHTML = `${themeBtn()}<h1>Junior Astronaut Mission Trainer</h1>
     <p>Keep ${CREW} astronauts alive at an outpost for ${cfg.days} days. Each day, assign your crew to jobs, then end the day. Watch the forecast!</p>
     <div class="card"><h2>Choose a world</h2>${seg('planet',[['mars','Mars'],['moon','The Moon']])}
     <h2>Choose a difficulty</h2>${seg('diff',[['easy','Easy'],['normal','Normal'],['hard','Hard']])}
@@ -151,7 +198,8 @@ function draw(){
   }
   if(scr !== 'play'){
     const w = scr==='win';
-    el.innerHTML = `<h1>${w?'Mission complete!':'Mission over'}</h1>
+    el.innerHTML = `${themeBtn()}<h1>${w?'Mission complete!':'Mission over'}</h1>
+    ${w ? confetti() : ''}
     <div class="card"><p>${w?`Your crew survived all ${goal()} days on ${P.name}.`:`The crew could not go on after ${S.done} ${P.unit}${S.done===1?'':'s'}.`}</p>
     <h2>Score: ${score()}${S.newBest?' (new best!)':''}</h2><p class="log">Best score here: ${getBest()}</p></div>
     <div class="card"><h2>Resources over time</h2>${chart()}</div>
@@ -166,9 +214,10 @@ function draw(){
     : S.next==='flare' ? `<div class="alert bad"><b>Forecast:</b> solar flare. A shield of ${P.dose} or more blocks it fully.</div>`
     : '<div class="alert good"><b>Forecast:</b> clear skies.</div>';
   const u = k => Math.round(BASE.use[k]*D.use);
-  el.innerHTML = `<div class="top"><h1>Mission: ${P.name}</h1><span class="log">Difficulty: ${cfg.diff}</span></div>
+  el.innerHTML = `${themeBtn()}<div class="top"><h1>Mission: ${P.name}</h1><span class="log">Difficulty: ${cfg.diff}</span></div>
   <div class="card"><div class="top"><h2>${P.unit[0].toUpperCase()+P.unit.slice(1)} ${S.day} of ${goal()}</h2><span class="log">Crew assigned: ${used()} / ${CREW}</span></div>
-  ${bar('Power',S.pw,'--pw')}${bar('Oxygen',S.o2,'--o2')}${bar('Food',S.fd,'--fd')}${bar('Shield',S.sh,'--sh')}${bar('Crew health',S.hp,'--ok')}
+  ${bar('Power',S.pw,'--pw')}${bar('Oxygen',S.o2,'--o2')}${bar('Food',S.fd,'--fd')}${bar('Shield',S.sh,'--sh')}
+  <div class="${S.tookDamage?'hurt':''}">${bar('Crew health',S.hp,'--ok')}</div>
   <p class="log">Each ${P.unit} the base uses ${u('pw')} power, ${u('o2')} oxygen and ${u('fd')} food. Shield slowly wears down.</p></div>${f}
   <div class="card"><h2>Assign your crew</h2>${TASKS.map(t=>`<div class="task"><div><b>${t.n}</b><small>${t.d}</small></div>
   <button class="step alt" aria-label="Remove one from ${t.n}" onclick="adj('${t.k}',-1)">−</button><span class="n">${A[t.k]}</span>
@@ -176,5 +225,6 @@ function draw(){
   <p><button onclick="endDay()" ${used()<CREW?'disabled':''}>End ${P.unit} ${S.day}</button>${used()<CREW?` <span class="log">Assign all ${CREW} crew first.</span>`:''}</p></div>
   <div class="card log" aria-live="polite"><b>Last ${P.unit}:</b><br>${S.log.length?S.log.join('<br>'):'Nothing yet. Make your first plan.'}</div>`;
 }
+initTheme();
 draw();
 </script></body></html>
